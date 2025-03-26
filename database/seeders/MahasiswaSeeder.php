@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Faker\Factory as Faker;
+use Carbon\Carbon; // Import Carbon
 
 class MahasiswaSeeder extends Seeder
 {
@@ -29,8 +30,8 @@ class MahasiswaSeeder extends Seeder
             'email' => 'ardli.23196@mhs.unesa.ac.id',
             'status' => 'Aktif',
             'agama' => 'Islam',
-            'created_at' => now(),
-            'updated_at' => now(),
+            'created_at' => Carbon::now(),  // Gunakan Carbon::now()
+            'updated_at' => Carbon::now(),  // Gunakan Carbon::now()
         ]);
 
         // Membuat 20 data dummy menggunakan Faker
@@ -42,12 +43,12 @@ class MahasiswaSeeder extends Seeder
                 'alamat' => $faker->address,
                 'tanggal_lahir' => $faker->date('Y-m-d', '2005-12-31'), // Batasi tanggal lahir
                 'program_studi' => $faker->randomElement(['Teknik Informatika', 'Sistem Informasi', 'Manajemen Informatika']),
-                'angkatan' => $faker->numberBetween('2019, 2023'), // Batasi tahun angkatan
+                'angkatan' => $faker->numberBetween(2019, 2023), // Batasi tahun angkatan (gunakan koma, bukan string)
                 'email' => $faker->unique()->safeEmail,
                 'status' => $faker->randomElement(['Aktif', 'Cuti', 'Lulus', 'Drop Out']),
                 'agama' => $faker->randomElement(['Islam', 'Kristen Protestan', 'Katolik', 'Hindu', 'Buddha', 'Konghucu']),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => Carbon::now(), // Gunakan Carbon::now()
+                'updated_at' => Carbon::now(), // Gunakan Carbon::now()
             ]);
         }
     }
