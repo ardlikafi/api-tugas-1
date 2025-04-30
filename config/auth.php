@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'web'),
+        'guard' => env('AUTH_GUARD', 'web'), // Default tetap 'web' biasanya tidak masalah
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
@@ -31,7 +31,7 @@ return [
     | users are actually retrieved out of your database or other storage
     | system used by the application. Typically, Eloquent is utilized.
     |
-    | Supported: "session"
+    | Supported: "session", "token" (untuk API token bawaan Laravel), "jwt" (dari package)
     |
     */
 
@@ -40,6 +40,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // --- TAMBAHKAN BAGIAN INI ---
+        'api' => [
+            'driver' => 'jwt',       // Gunakan driver 'jwt' dari tymon/jwt-auth
+            'provider' => 'users',   // Gunakan provider 'users' yang sudah ada
+        ],
+        // --- AKHIR BAGIAN TAMBAHAN ---
     ],
 
     /*
@@ -62,6 +69,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
+            // Pastikan ini menunjuk ke model User Anda yang benar
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
@@ -111,5 +119,14 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+
+    'passwords' => [
+        'users' => [
+            'provider' => 'users',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+    ],
 
 ];
