@@ -5,60 +5,70 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash; // Import Hash
 use Illuminate\Support\Facades\Validator;
-use App\Models\User; // Jangan lupa import User model
+use App\Models\User;
 
 class AuthController extends Controller
 {
-    /**
-     * Membuat instance AuthController baru.
-     * Menerapkan middleware auth:api kecuali untuk method login.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        // Terapkan middleware 'auth:api' (yang menggunakan guard 'api' dengan driver 'jwt')
-        // Kecuali untuk method 'login'
-        $this->middleware('auth:api', ['except' => ['login']]);
-    }
 
-    /**
-     * Proses login user dan kembalikan JWT token.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function login(Request $request)
     {
-        // Validasi input
         $validator = Validator::make($request->all(), [
+            // Pilih mau login pakai email atau username
             'email' => 'required|email',
-            'password' => 'required|string|min:6', // Sesuaikan min jika perlu
+            'password' => 'required|string|min:6',
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422); // Unprocessable Entity
+            return response()->json($validator->errors(), 422);
         }
 
-        // Coba otentikasi menggunakan kredensial yang divalidasi
-        // Kita gunakan Auth::guard('api') karena kita mengkonfigurasi guard 'api' untuk JWT
-        if (! $token = Auth::guard('api')->attempt($validator->validated())) {
-            return response()->json(['error' => 'Unauthorized'], 401); // Unauthorized
+        // Sesuaikan credentials berdasarkan input login
+        $credentials = $request->only('email', 'password');
+        if (! $token = Auth::guard('api')->attempt($credentials)) { // Gunakan $credentials
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // Jika berhasil, kembalikan token
+        return $this->respondWithToken($token);
+
+        if (! $token = Auth::guard('api')->attempt($credentials)) { // Gunakan $credentials
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
         return $this->respondWithToken($token);
     }
 
     /**
-     * Dapatkan detail user yang sedang login.
+     * Register a User.
      *
      * @return \Illuminate\Http\JsonResponse
      */
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|between:2,100',
+            'email' => 'required|string|email|max:100|unique:users',
+            'password' => 'required|string|confirmed|min:6', // 'confirmed' berarti harus ada field 'password_confirmation'
+        ]);
+
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        $user = User::create(array_merge(
+                    $validator->validated(),
+                    ['password' => Hash::make($request->password)]
+                ));
+
+        return response()->json([
+            'message' => 'User successfully registered',
+            'user' => $user
+        ], 201);
+    }
+
     public function me()
     {
-        // Dapatkan user yang terotentikasi melalui guard 'api'
         try {
             $user = Auth::guard('api')->userOrFail();
             return response()->json($user);
@@ -67,48 +77,32 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Proses logout user (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function logout()
     {
-        Auth::guard('api')->logout(); // Invalidate token untuk guard 'api'
-
+        Auth::guard('api')->logout();
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-    /**
-     * Refresh token. User harus sudah login.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function refresh()
     {
-        // Refresh token untuk guard 'api'
         try {
             $newToken = Auth::guard('api')->refresh();
             return $this->respondWithToken($newToken);
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-            return response()->json(['error' => 'Could not refresh token'], 500);
+            // Jika token tidak bisa direfresh (misalnya sudah di blacklist atau invalid)
+            return response()->json(['error' => 'Could not refresh token, please login again'], 401);
         }
     }
 
-    /**
-     * Format response dengan token JWT.
-     *
-     * @param  string $token
-     * @return \Illuminate\Http\JsonResponse
-     */
     protected function respondWithToken($token)
     {
-        $ttl = Auth::guard('api')->factory()->getTTL() * 60; // Dapatkan TTL (Time To Live) dalam detik
+        // Ambil TTL dari konfigurasi JWT (config/jwt.php)
+        $ttl = config('jwt.ttl') * 60; // TTL di config adalah menit, ubah ke detik
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => $ttl // Waktu kadaluarsa token dalam detik
+            'expires_in' => $ttl
         ]);
     }
 }
