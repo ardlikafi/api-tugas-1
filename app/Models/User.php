@@ -19,8 +19,8 @@ class User extends Authenticatable implements JWTSubject // Implementasikan JWTS
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',     // Saya asumsikan kamu juga ingin 'name' untuk registrasi
-        'username', // Dari migrasi create_users_table di tugasmu
+        'name',     
+        'username', 
         'email',
         'password',
     ];

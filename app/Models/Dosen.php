@@ -9,5 +9,15 @@ class Dosen extends Model
 {
     use HasFactory;
     protected $table = 'dosen';
-    protected $fillable = ['nama_dosen', 'nidn', 'email', 'program_studi', 'tanggal_lahir', 'jenis_kelamin', 'status'];
+    protected $fillable = [
+        'nama_dosen', 
+        'nidn', 
+        'email', 
+        'program_studi', 
+        'tanggal_lahir', 
+        'jenis_kelamin', 
+        'status',
+        'alamat',
+        'bidang_keahlian'
+    ];
 }

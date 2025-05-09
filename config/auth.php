@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'web'), // Default tetap 'web' biasanya tidak masalah
+        'guard' => env('AUTH_GUARD', 'web'), // defaultnya 'web'
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
@@ -41,10 +41,10 @@ return [
             'provider' => 'users',
         ],
 
-        // --- TAMBAHKAN BAGIAN INI ---
+        // --- BAGIAN TAMBAHAN ---
         'api' => [
-            'driver' => 'jwt',       // Gunakan driver 'jwt' dari tymon/jwt-auth
-            'provider' => 'users',   // Gunakan provider 'users' yang sudah ada
+            'driver' => 'jwt',       // Menggunakan driver 'jwt' dari tymon/jwt-auth
+            'provider' => 'users',   // Menggunakan provider 'users' yang sudah ada
         ],
         // --- AKHIR BAGIAN TAMBAHAN ---
     ],

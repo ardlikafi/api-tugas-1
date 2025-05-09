@@ -1,0 +1,428 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Dokumentasi MATKUL_API (UNESA)",
+        "description": "Dokumentasi API untuk proyek MATKUL_API. Mencakup Dosen, Mahasiswa, dll. Dilindungi oleh JWT.",
+        "contact": {
+            "email": "admin@unesa.ac.id"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "API Server Utama (biasanya http://localhost:8000 atau domain produksi)"
+        }
+    ],
+    "paths": {
+        "/api/dosen": {
+            "get": {
+                "tags": [
+                    "Dosen"
+                ],
+                "summary": "Ambil daftar semua dosen",
+                "description": "Mengembalikan daftar semua data dosen. Membutuhkan autentikasi JWT.",
+                "operationId": "getDosenList",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Dosen"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated / Token tidak valid"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Dosen"
+                ],
+                "summary": "Buat data dosen baru",
+                "description": "Menyimpan data dosen baru ke dalam database. Membutuhkan autentikasi JWT.",
+                "operationId": "storeDosen",
+                "requestBody": {
+                    "description": "Payload data dosen",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DosenInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Dosen berhasil dibuat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Dosen"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Input tidak valid / Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated / Token tidak valid"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dosen/{id}": {
+            "get": {
+                "tags": [
+                    "Dosen"
+                ],
+                "summary": "Ambil data dosen berdasarkan ID",
+                "description": "Mengembalikan satu data dosen. Membutuhkan autentikasi JWT.",
+                "operationId": "getDosenById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID Dosen",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Dosen"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated / Token tidak valid"
+                    },
+                    "404": {
+                        "description": "Dosen tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Dosen"
+                ],
+                "summary": "Update data dosen yang ada",
+                "description": "Memperbarui data dosen. Membutuhkan autentikasi JWT.",
+                "operationId": "updateDosen",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID Dosen",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Payload data dosen untuk update",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DosenInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Dosen berhasil diupdate",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Dosen"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Input tidak valid / Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated / Token tidak valid"
+                    },
+                    "404": {
+                        "description": "Dosen tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Dosen"
+                ],
+                "summary": "Hapus data dosen",
+                "description": "Menghapus data dosen berdasarkan ID. Membutuhkan autentikasi JWT.",
+                "operationId": "deleteDosen",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID Dosen",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Dosen berhasil dihapus (No Content)"
+                    },
+                    "401": {
+                        "description": "Unauthenticated / Token tidak valid"
+                    },
+                    "404": {
+                        "description": "Dosen tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Dosen": {
+                "title": "Dosen Model",
+                "description": "Representasi data dosen",
+                "properties": {
+                    "id": {
+                        "description": "ID unik dosen",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "nama_dosen": {
+                        "description": "Nama lengkap dosen",
+                        "type": "string",
+                        "example": "Dr. Budi Santoso, M.Kom."
+                    },
+                    "nidn": {
+                        "description": "Nomor Induk Dosen Nasional",
+                        "type": "string",
+                        "example": "0012345678"
+                    },
+                    "alamat": {
+                        "description": "Alamat tinggal dosen",
+                        "type": "string",
+                        "example": "Jl. Merdeka No. 10, Surabaya"
+                    },
+                    "program_studi": {
+                        "description": "Program studi yang diampu",
+                        "type": "string",
+                        "example": "S1 Teknik Informatika"
+                    },
+                    "email": {
+                        "description": "Alamat email dosen",
+                        "type": "string",
+                        "format": "email",
+                        "example": "budi.santoso@example.com"
+                    },
+                    "tanggal_lahir": {
+                        "description": "Tanggal lahir dosen (YYYY-MM-DD)",
+                        "type": "string",
+                        "format": "date",
+                        "example": "1980-05-15"
+                    },
+                    "jenis_kelamin": {
+                        "description": "Jenis kelamin (L: Laki-laki, P: Perempuan)",
+                        "type": "string",
+                        "enum": [
+                            "L",
+                            "P"
+                        ],
+                        "example": "L"
+                    },
+                    "status": {
+                        "description": "Status kepegawaian dosen",
+                        "type": "string",
+                        "enum": [
+                            "Dosen Tetap",
+                            "Dosen Tidak Tetap"
+                        ],
+                        "example": "Dosen Tetap"
+                    },
+                    "bidang_keahlian": {
+                        "description": "Bidang keahlian utama dosen",
+                        "type": "string",
+                        "example": "Rekayasa Perangkat Lunak, Kecerdasan Buatan"
+                    },
+                    "created_at": {
+                        "description": "Waktu data dibuat",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Waktu data terakhir diupdate",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "DosenInput": {
+                "title": "Dosen Input Payload",
+                "description": "Data yang dibutuhkan untuk membuat atau mengupdate dosen",
+                "required": [
+                    "nama_dosen",
+                    "nidn",
+                    "alamat",
+                    "program_studi",
+                    "email",
+                    "tanggal_lahir",
+                    "jenis_kelamin",
+                    "status",
+                    "bidang_keahlian"
+                ],
+                "properties": {
+                    "nama_dosen": {
+                        "type": "string",
+                        "example": "Dr. Siti Aminah, M.Sc."
+                    },
+                    "nidn": {
+                        "type": "string",
+                        "example": "0098765432"
+                    },
+                    "alamat": {
+                        "type": "string",
+                        "example": "Jl. Pahlawan No. 1, Sidoarjo"
+                    },
+                    "program_studi": {
+                        "type": "string",
+                        "example": "S1 Sistem Informasi"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "siti.aminah@example.com"
+                    },
+                    "tanggal_lahir": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1985-10-20"
+                    },
+                    "jenis_kelamin": {
+                        "type": "string",
+                        "enum": [
+                            "L",
+                            "P"
+                        ],
+                        "example": "P"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "Dosen Tetap",
+                            "Dosen Tidak Tetap"
+                        ],
+                        "example": "Dosen Tetap"
+                    },
+                    "bidang_keahlian": {
+                        "type": "string",
+                        "example": "Data Science, Basis Data"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Masukkan token JWT dengan prefix Bearer (Contoh: 'Bearer token_anda_disini')",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Dosen",
+            "description": "Operasi terkait Data Dosen"
+        }
+    ]
+}
